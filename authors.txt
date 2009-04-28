@@ -8,6 +8,7 @@ chiussi = Mike Chiussi <chiussi@gmail.com>
 chrisw = Christian Wilms <christian.wilms@gmx.de>
 coderman = Martin Peck <coder@peertech.org>
 goodell = Geoff Goodell <goodell@eecs.harvard.edu>
+guest = (Bogus user) <nobody@example.com>
 ioerror = Jacob Appelbaum <jacob@appelbaum.net>
 kloesing = Karsten Loesing <karsten.loesing@gmx.net>
 mikeperry = Mike Perry <mikeperry-git@fscked.org>
