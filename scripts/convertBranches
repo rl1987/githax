@@ -11,6 +11,6 @@ for branch in `git branch -r |grep -v svn/tags`; do
 
     if [ -z $yesno ] || [ $yesno = "Y" ]; then
         git branch $name $branch
-	dit -d -r $branch
+	git branch -d -r $branch
     fi
 done
