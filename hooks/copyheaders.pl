@@ -3,14 +3,20 @@
 $from = "";
 $subject = "";
 $date = "";
+$commit = "";
 
 while(<>) {
   print;
   chomp;
-  if (/^From: (.*)/) { $from = $1; }
-  if (/^Subject: \[[^\]]*\] *(.*)/) { $subject = $1; }
-  if (/^Date: (.*)/) { $date = $1; }
-  if (/^$/) { print "Author: $from\nDate: $date\nSubject: $subject\n\n"; last; }
+  if (/^From ([A-Fa-f0-9]+)/) { $commit = $1; }
+  elsif (/^From: (.*)/) { $from = $1; }
+  elsif (/^Subject: \[[^\]]*\] *(.*)/) { $subject = $1; }
+  elsif (/^Date: (.*)/) { $date = $1; }
+  elsif (/^$/) {
+      print "Author: $from\nDate: $date\nSubject: $subject\n";
+      print "Commit: $commit\n\n";
+      last;
+  }
 }
 
 while(<>)  { print; }
