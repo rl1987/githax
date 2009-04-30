@@ -8,6 +8,8 @@
 export GITHAX=/path/to/this/directory
 
 # Edit the authors file.  Make sure _everybody_ is in it.
+#
+# Make sure it is in, and stays in, UTF-8.  Git likes to use UTF-8.
 
 mkdir thandy_tmp
 cd thandy_tmp
@@ -15,6 +17,17 @@ cd thandy_tmp
 # able to refer back to svn revisions.
 git svn init --trunk=updater/trunk --branches=updater/branches --tags=updater/tags --prefix=svn/ file:///home/or/svnrepo/
 git svn fetch --authors-file=$GITHAX/authors.txt
+
+# (This would be a good point to make a backup, so you don't have to
+#  do it all again if you mess up a later step.)
+
+# Filter svn metadata to a prettier format
+git filter-branch --msg-filter '
+        sed "s/^git-svn-id:[[:space:]]*[^[:space:]]*@\([[:digit:]]\{1,\}\)[[:space:]]*.*$/svn:r\1/"
+    ' --tag-name-filter cat -- --all
+
+# (This would be a good point to make another backup.  Now the steps
+#  that eat CPU time are over.)
 
 # Set up local branches: git clone will not preserve these.
 #    git branch [newname] svn/[oldname]
@@ -42,18 +55,30 @@ vim .gitignore
 git add .gitignore
 git commit -m 'Add a gitignore file.'
 
-# Filter svn metadata to a prettier format
-git filter-branch --msg-filter '
-        sed "s/^git-svn-id:[[:space:]]*[^[:space:]]*@\([[:digit:]]\{1,\}\)[[:space:]]*.*$/svn:r\1/"
-    ' -- --all
 
 cd ..
 git clone --bare thandy_tmp thandy.git
+
+# Compress the repository.
+#    This process is voodoo, but it seemed to work for me.  I am not sure
+#    that this order is optimal, or that both git prunes are necessary.
+#    The first 8 approaches I tried were definitely all not-optimal,
+#    though.
+
+cd thandy.git
+git pack-refs --prune
+git reflog expire --all
+git prune
+git gc --aggressive
+git prune
+git repack -adf --window=200 --depth=100
+
+
 # Edit the configuration
 cp $GITHAX/config thandy.git
 vim thandy.git/config
 
-# Edit the hooks
+# Set up the hooks
 #     - Email hook
 cp /home/or/git-hooks/post-receive thandy.git/hooks
 chmod +x thandy.git/hooks/post-receive
