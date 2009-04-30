@@ -1,0 +1,43 @@
+#!/bin/bash
+# By Sebastian Hahn.  Checks whether a set of tags are the same as the
+# signed bundles from the dist directory.
+
+TMP_DIR=~/tmp
+GIT_DIR=~/coding/git/tor-git/tor
+TMP_DIR_TARBALLS=$TMP_DIR/tarballs
+TMP_DIR_GIT=$TMP_DIR/git
+
+#######
+
+
+CUR_DIR=`pwd`
+
+cd $TMP_DIR_GIT
+git clone $GIT_DIR git
+cd git
+for TAG in `git tag | grep ^tor`
+do
+
+  # if there is output, the signature is bad!
+  echo checking $TAG
+  if [ ! -f $TMP_DIR_TARBALLS/$TAG.tar.gz ];
+  then
+    echo "tarball for $TAG doesn't exist";
+    echo
+    continue
+  else if [ ! -f $TMP_DIR_TARBALLS/$TAG.tar.gz.asc ];
+  then
+    echo "tarball for $TAG isn't signed"
+  else
+    gpg --batch --output - --verify $TMP_DIR_TARBALLS/$TAG.tar.gz.asc $TMP_DIR_TARBALLS/$TAG.tar.gz 2>&1 | grep -v "gpg: Signature made" | grep -v "gpg: Good signatu"
+    fi
+  fi
+
+  tar xzf $TMP_DIR_TARBALLS/$TAG.tar.gz -C $TMP_DIR_TARBALLS/
+  git checkout -qf $TAG
+  diff -w -ur $TMP_DIR_TARBALLS/$TAG $TMP_DIR_GIT/git -I "\$Id" | grep -v "Only in"
+  echo
+done
+
+
+cd $CUR_DIR
