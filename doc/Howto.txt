@@ -1,5 +1,5 @@
-How to use Git to work on Thandy
-================================
+How to use Git to work with Tor software
+========================================
 
 Before you start
 ----------------
@@ -16,10 +16,13 @@ If you know how to use Git
 
 If you know how to use Git, all you need to know is that the official
 Thandy repository is at
-        git://git.torproject.org/git/thandy
+        git://git.torproject.org/git/PROJECT
 and that if you're updating the official repository (we will tell you
 if you're such a person), ssh access is at:
-        ssh://git.torproject.org/var/cache/git/thandy
+        ssh://git.torproject.org/var/cache/git/PROJECT
+
+(For the main Tor software, PROJECT is "tor".  For Thandy, PROJECT
+is "thandy".  And so on.)
 
 There.  Done.  Go use git; you know How.
 
@@ -51,9 +54,9 @@ This should add the following lines into your ~/.gitconfig file:
 ------------------------------
 
 If you already have set up a global .gitconfig, but you want to use a
-different name or email for Thandy, you can override the global user settings
-by running 'git config' without the '--global' argument from inside a
-repository. Before you can do that, though, you'll need to fetch Thandy's
+different name or email for this repository, you can override the global user
+settings by running 'git config' without the '--global' argument from inside
+a repository. Before you can do that, though, you'll need to fetch the
 repository.
 
 If you don't know how to use Git: Getting started
@@ -64,13 +67,13 @@ Now we can fetch the repository!  I like to do all my development under
 
 -----
 % cd src
-% git clone git://git.torproject.org/git/thandy
+% git clone git://git.torproject.org/git/PROJECT
 -----
 
-There's now a '~/src/thandy' directory with the latest Thandy in it.  I
+There's now a '~/src/PROJECT' directory with the latest version in it.  I
 can build and edit and mess with this source to my heart's content.
 
-All the Git metadata for my project lives in ~/src/thandy/.git , so it's
+All the Git metadata for my project lives in ~/src/PROJECT/.git , so it's
 safe to move your checkout around wherever or rename it if you don't
 like it.
 
@@ -90,7 +93,7 @@ cheap local branch whenever you start working on a new feature or set of
 features.  This makes our commits neater, and makes it easier to hold
 off on pushing work into the mainline.
 
-Let's pretend we're adding FTP support to Thandy.  We'll want to make a
+Let's pretend we're adding FTP support to the software.  We'll want to make a
 new branch to work on it, like this:
 
 -----
@@ -205,7 +208,7 @@ While you work, there's an upstream repository that's changing too.
 You can update your copy of it with
 
 -----
-% git fetch git://git.torproject.org/git/thandy
+% git fetch git://git.torproject.org/git/PROJECT
 -----
 
 That's pretty verbose.  Fortunately, since you started by cloning from
@@ -294,14 +297,14 @@ just do:
 -----
 % mkdir ~/git
 % cd ~/git
-% git clone --bare /var/cache/git/thandy.git thandy.git
-% touch thandy.git/git-daemon-export-ok
+% git clone --bare /git/PROJECT.git PROJECT.git
+% touch PROJECT.git/git-daemon-export-ok
 -----
 
 And now you have a new Git repository that other people can fetch from
-git://git.torproject.org/~USERNAME/git/thandy
+git://git.torproject.org/~USERNAME/git/PROJECT
 
-For you, that's ssh://git.torproject.org/~USERNAME/git/thandy : you can
+For you, that's ssh://git.torproject.org/~USERNAME/git/PROJECT : you can
 follow the instructions at
 
 http://www.kernel.org/pub/software/scm/git/docs/user-manual.html#pushing-changes-to-a-public-repository
@@ -321,13 +324,13 @@ repository. Let's say Nick has published his ftp branch, and you want to
 give it a shot. It is not yet ready to be merged to the master branch, so
 you cannot just pull from the master branch. Nick tells you his branch is
 called ftp, and his repository lives at
-git://git.torproject.org/~nickm/git/thandy.
+git://git.torproject.org/~nickm/git/PROJECT.
 
 Now it's time for you to add a remote for nicks repository, get his
 published branches, and make a local branch that tracks his ftp branch:
 
 -----
-%git remote add nick git://git.torproject.org/~nickm/git/thandy
+%git remote add nick git://git.torproject.org/~nickm/git/PROJECT
 %git fetch nick
 %git checkout -b nick_ftp nick/ftp
 -----
