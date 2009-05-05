@@ -364,9 +364,9 @@ Now it's time for you to add a remote for nicks repository, get his
 published branches, and make a local branch that tracks his ftp branch:
 
 -----
-%git remote add nick git://git.torproject.org/~nickm/git/PROJECT
-%git fetch nick
-%git checkout -b nick_ftp nick/ftp
+% git remote add nick git://git.torproject.org/~nickm/git/PROJECT
+% git fetch nick
+% git checkout -b nick_ftp nick/ftp
 -----
 
 This will have switched you to your new local branch nick_ftp, and you can
@@ -374,7 +374,7 @@ build and test the ftp stuff that nick made. If you're done with testing,
 just type
 
 -----
-%git checkout master
+% git checkout master
 -----
 
 to go back to your master branch. Maybe, a few days later, Nick has made
@@ -382,8 +382,8 @@ some changes that you would like to look at. First, you fetch his stuff
 again and switch to your local branch that tracks his ftp branch:
 
 -----
-%git fetch nick
-%git checkout nick_ftp
+% git fetch nick
+% git checkout nick_ftp
 -----
 
 git will tell you that there has been an update to the branch that you
@@ -391,7 +391,7 @@ checked out. To get the new stuff in, and rebase any changes that you may
 have made in the meantime, type:
 
 -----
-%git rebase
+% git rebase
 -----
 
 This fast-forwards the branch if you haven't made changes, or first
@@ -403,8 +403,8 @@ If you want to actually merge his ftp branch into one of your other local
 branches called $branch, do this:
 
 -----
-%git checkout $branch
-%git merge nick_ftp
+% git checkout $branch
+% git merge nick_ftp
 -----
 
 Git will automatically merge nick_ftp into $branch.
