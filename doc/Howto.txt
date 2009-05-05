@@ -15,7 +15,7 @@ If you know how to use Git
 --------------------------
 
 If you know how to use Git, all you need to know is that the official
-Thandy repository is at
+PROJECT repository is at
         git://git.torproject.org/git/PROJECT
 and that if you're updating the official repository (we will tell you
 if you're such a person), ssh access is at:
@@ -130,7 +130,7 @@ This asks us for a commit message, and commits every changed file.
 
 If we only want to commit some files, or if we want to add new files
 that were not previously in the repository, we use the 'git add' command
-to tell Git what to commit, and then we use 'git commit' without the
+to tell Git what to add, and then we use 'git commit' without the
 '-a' flag to commit them.
 
 -----
@@ -249,7 +249,7 @@ instead of letting `git merge` create an implicit merge commit:
 (Rebase with caution!  See notes on rebasing below.)
 
 Now, what should we do about our local ftp branch?  It's still based on
-the pre-pull  version.  We have a few choices.
+the pre-pull version.  We have a few choices.
 
 1. We could let it stay based on the old version until we're ready to
    merge it into our master branch, or send it in as a patch, or
@@ -274,7 +274,7 @@ the pre-pull  version.  We have a few choices.
 % git rebase master
 -----
 
-   This is a fine thing to do on a _local_ branch, but you should never
+   Rebasing is a fine thing to do on a _local_ branch, but you should never
    do it (or any other kind of "history rewriting") on a branch you have
    published to others.
 
@@ -361,7 +361,7 @@ have made in the meantime, type:
 -----
 
 This fast-forwards the branch if you haven't made changes, or first
-applies the changes from nick's repository and the replays your changes on
+applies the changes from nick's repository and then replays your changes on
 top of the result. If you then want to make a patch based on your changes
 to send to nick, it's easy. Use git format-patch (see above).
 
@@ -389,3 +389,4 @@ http://www.kernel.org/pub/software/scm/git/docs/git-rebase.html
 
 And the Git tutorial which is also a good guide to get started:
 http://www.kernel.org/pub/software/scm/git/docs/gittutorial.html
+
