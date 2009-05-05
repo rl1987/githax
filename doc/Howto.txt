@@ -192,6 +192,25 @@ in your index,
 If you want to generate a set of patches to mail to the maintainer,
 use 'git format-patch' instead of diff or log.
 
+In our example, if you want to create a patch containing all your commits
+to the ftp branch since it was branched from master, you can do
+
+----
+% git format-patch master
+----
+
+This operation will create a separate file for each commit you made in the
+ftp branch:
+
+0001-first-change.patch
+0002-second-change.patch
+...
+
+Mail these files to the project maintainer, maybe with a short idea what
+your bunch of patches is supposed to do, and the maintainer can apply them
+to the official repository.
+
+
 A NOTE ON COMMIT MESSAGES: Many Git tools (like the commit emails, and
 the shortlogs) will give better output if commit messages come in a
 special format.  The first line of the commit message should be a short
@@ -304,13 +323,28 @@ just do:
 And now you have a new Git repository that other people can fetch from
 git://git.torproject.org/~USERNAME/git/PROJECT
 
-For you, that's ssh://git.torproject.org/~USERNAME/git/PROJECT : you can
-follow the instructions at
+For you, that's ssh://git.torproject.org/~USERNAME/git/PROJECT .
+
+It's useful to add a remote as shortcut for your public repository:
+
+-----
+% git remote add public ssh://git.torproject.org/~USERNAME/git/PROJECT
+-----
+
+If you want to make your ftp branch available for others, you can push it
+to your public repository. If there is no ftp branch in your public
+repository yet, it will be created:
+
+-----
+% git checkout ftp
+% git push public ftp
+-----
+
+See the instructions at
 
 http://www.kernel.org/pub/software/scm/git/docs/user-manual.html#pushing-changes-to-a-public-repository
 
-to push branches to your public repository.
-
+for more information on pushing branches to public repositories.
 
 If you don't have an account on Moria, see the rest of the documentation
 in that part of the Git manual.  Or go use github: it's pretty neat.
