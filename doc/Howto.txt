@@ -295,7 +295,7 @@ the pre-pull version.  We have a few choices.
 
    Rebasing is a fine thing to do on a _local_ branch, but you should never
    do it (or any other kind of "history rewriting") on a branch you have
-   published to others.
+   published to others. See the next topic for details.
 
 
 
@@ -339,6 +339,13 @@ repository yet, it will be created:
 % git checkout ftp
 % git push public ftp
 -----
+
+Note that if you do not tell others explictly that you might be rebasing
+this branch, they could start basing work on it. When you then change the
+history, they will have some work to get their repositories back up in
+sync with your changes. Also note that rebasing branches intended for the
+maintainer of the project is not a bad thing - it helps to make his job
+easier by allowing fast-forwards when possible.
 
 See the instructions at
 
