@@ -340,6 +340,21 @@ repository yet, it will be created:
 % git push public ftp
 -----
 
+You may also decide to give your remote branch a name that is distinct from
+the local name:
+
+-----
+% git push public ftp:ftpimprovements
+-----
+
+When your changes have been pulled by the project maintainer into the
+official repository and there is no need to have your remote branch
+anymore, you can get rid of it:
+
+-----
+% git push public :ftpimprovements
+-----
+
 Note that if you do not tell others explictly that you might be rebasing
 this branch, they could start basing work on it. When you then change the
 history, they will have some work to get their repositories back up in
