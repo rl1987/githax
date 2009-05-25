@@ -389,6 +389,7 @@ published branches, and make a local branch that tracks his ftp branch:
 % git remote add nick git://git.torproject.org/~nickm/git/PROJECT
 % git fetch nick
 % git branch --track nick_ftp nick/ftp
+% git checkout nick_ftp
 -----
 
 This will have switched you to your new local branch nick_ftp, and you can
