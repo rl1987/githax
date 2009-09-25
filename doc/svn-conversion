@@ -21,6 +21,12 @@ git svn fetch --authors-file=$GITHAX/authors.txt
 # (This would be a good point to make a backup, so you don't have to
 #  do it all again if you mess up a later step.)
 
+# Set up a gitignore file
+git svn show-ignore > .gitignore
+vim .gitignore
+git add .gitignore
+git commit -m 'Add a gitignore file.'
+
 # Filter svn metadata to a prettier format
 git filter-branch --msg-filter '
         sed "s/^git-svn-id:[[:space:]]*[^[:space:]]*@\([[:digit:]]\{1,\}\)[[:space:]]*.*$/svn:r\1/"
@@ -48,13 +54,6 @@ git filter-branch --msg-filter '
 
 # Delete branches and tags that you don't want
 #   git branch -d badBranch
-
-# Set up a gitignore file
-git svn show-ignore > .gitignore
-vim .gitignore
-git add .gitignore
-git commit -m 'Add a gitignore file.'
-
 
 cd ..
 git clone --bare thandy_tmp thandy.git
