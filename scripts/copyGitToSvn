@@ -1,0 +1,122 @@
+#!/usr/bin/perl -w
+# by Nick Mathewson
+# Copyright 2009, The Tor Project.
+#
+# Copy files from a Git checkout to an SVN repository, and svn add/rm
+# files as appropriate.
+#
+# WARNING: THIS PROGRAM IS NOT ROBUST AGAINST HOSTILE FILENAMES IN THE
+#          GIT REPOSITORY.  If somebody makes a file called "; rm -rf /"
+#          then you're in trouble.
+#
+# BUG: Doesn't remove directories yet.
+
+use strict;
+use File::Copy;
+
+# If you aren't nickm, you may want to edit these.
+my $GITDIR = '/home/nickm/src/tor';
+my $SVNDIR = '/home/nickm/src/tor-svn';
+
+my %gitfiles = ();
+my %svnfiles = ();
+my %svndirs = ();
+
+#####
+# Learn all the files that are checked into Git master
+chdir $GITDIR or die;
+open F, "git branch|" or die;
+my $onbranch = "";
+for my $line (<F>) {
+    if ($line =~ /^\*\s+(\w+)/) {
+	$onbranch = $1;
+    }
+}
+close F;
+if ($onbranch ne 'master') {
+    system 'git checkout master' or die;
+} else {
+    print "On master\n";
+}
+
+open F, "git ls-tree -r HEAD |" or die;
+for my $line (<F>) {
+    if ($line =~ /\d+ blob [a-f0-9]+\s+(.*)/) {
+	$gitfiles{$1} = 1;
+    }
+}
+close F;
+
+#####
+# Learn all the files that are checked into svn
+
+# Subroutine: make sure we aren't missing any parent directories of a file
+sub addparentstosvndirs {
+    my $target = shift;
+    my $s = "";
+    return unless ($target =~ m#/#);
+    $target =~ s#/[^/]*$##;
+    for my $component (split m#/#, $target) {
+	$s .= "$component/";
+	if (not exists $svndirs{$s}) {
+	    $svndirs{$s} = 1;
+	}
+    }
+}
+
+chdir $SVNDIR or die;
+open F, "svn ls -R -r HEAD . |" or die;
+for my $line (<F>) {
+    chomp $line;
+    if ($line =~ m#/$#) {
+	$svndirs{$line} = 1;
+    } else {
+	addparentstosvndirs($line);
+	$svnfiles{$line} = 1;
+    }
+}
+close F;
+
+#####
+# Copy files from Git to svn, and svn add them as needed.
+
+# Subroutine: make sure we aren't missing parent directories of a file
+# in the SVN repository, and mkdir/add them as needed
+sub addparents {
+    my $target = shift;
+    my $s = "";
+    return unless ($target =~ m#/#);
+    $target =~ s#/[^/]*$##;
+    for my $component (split m#/#, $target) {
+	$s .= "$component/";
+	die unless (-d "$GITDIR/$s");
+	if (! exists $svndirs{$s}) {
+	    unless (-d "$SVNDIR/$s") {
+		print "mkdir $SVNDIR/$s\n";
+		mkdir "$SVNDIR/$s"
+	    }
+	    print "svn add --depth empty $s\n";
+	    system "svn add --depth empty $s";
+	    $svndirs{$s} = 1;
+	}
+    }
+}
+
+# Actually copy all the files.
+for my $fn (keys %gitfiles) {
+    addparents($fn);
+    File::Copy::copy("$GITDIR/$fn", "$SVNDIR/$fn");
+    if (! exists $svnfiles{$fn}) {
+	print "svn add $fn\n";
+	system "svn add $fn";
+    }
+}
+
+#####
+# Finally, svn rm any files that are in svn but not in git.
+for my $fn (keys %svnfiles) {
+    if (! exists $gitfiles{$fn}) {
+	print "svn rm $fn\n";
+	system "svn rm $fn";
+    }
+}
