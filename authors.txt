@@ -12,10 +12,12 @@ coderman = Martin Peck <coder@peertech.org>
 goodell = Geoff Goodell <goodell@eecs.harvard.edu>
 guest = (Bogus user) <nobody@example.com>
 ioerror = Jacob Appelbaum <jacob@appelbaum.net>
+kaner = Christian Fromme <kaner@strace.org>
 kloesing = Karsten Loesing <karsten.loesing@gmx.net>
 mikeperry = Mike Perry <mikeperry-git@fscked.org>
 montrose = Bruce Montrose <montrose@itd.nrl.navy.mil>
 nickm = Nick Mathewson <nickm@torproject.org>
+pde = Peter Eckersley <pde@eff.org>
 phobos = Andrew Lewman <andrew@torproject.org>
 sah = Steven Hazel <sah@freehaven.net>
 sebastian = Sebastian Hahn <sebastian@torproject.org>
@@ -40,13 +42,11 @@ weasel = Peter Palfrader <peter@palfrader.org>
 # guest
 # hanru
 # jan
-# kaner
 # kasimir
 # kloesing
 # le
 # mfr
 # moxie
-# pde
 # pootle
 # qbi
 # renner
