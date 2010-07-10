@@ -16,6 +16,7 @@ kaner = Christian Fromme <kaner@strace.org>
 kloesing = Karsten Loesing <karsten.loesing@gmx.net>
 mikeperry = Mike Perry <mikeperry-git@fscked.org>
 montrose = Bruce Montrose <montrose@itd.nrl.navy.mil>
+moxie = Moxie Marlinspike <moxie@thoughtcrime.org>
 nickm = Nick Mathewson <nickm@torproject.org>
 pde = Peter Eckersley <pde@eff.org>
 phobos = Andrew Lewman <andrew@torproject.org>
@@ -46,7 +47,6 @@ weasel = Peter Palfrader <peter@palfrader.org>
 # kloesing
 # le
 # mfr
-# moxie
 # pootle
 # qbi
 # renner
