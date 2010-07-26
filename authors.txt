@@ -3,6 +3,7 @@
 Urz = Christian King <urzumph@gmail.com>
 aas23 = Andrei Serjantov <aas23@freehaven.net>
 arma = Roger Dingledine <arma@torproject.org>
+atagar = Damian Johnson <atagar@torproject.org>
 badbytes = Matej Pjafjar <badbytes@freehaven.net>
 bergo = Felipe Bergo <bergo@seul.org>
 c = Chris Palmer <c@seul.org>
