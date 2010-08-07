@@ -1,0 +1,57 @@
+#!/bin/perl
+#
+# This is a handy tool I use to see which of my local (and public) branches
+# I have already merged into master.
+#
+# First, I make my master branch up to date with
+# "git checkout master; git pull"
+#
+# Then, I run this script with no arguments.  It tells me each branch
+# I have, and the number of unmerged commits in that branch that are
+# not also in master.  If I see a "0", I know that I either merged
+# that branch already, or never committed anything to it.  Unless it
+# is maint-0.2.1 or something else that I truly want to keep around, I
+# just delete it with "git branch -d branchname".
+#
+# Occasionally, I do the same thing with my public repository.  I update
+# it with "git fetch public; git remote prune public" to make sure I
+# have all and only the branches in my public repository.
+#
+# Then, I run this script with the name of my public repository as its
+# argument.  Lather, rinse, repeat.
+#
+# Incidentally, the SNUG/b/fS (SNUGbfs Needs to Understand GNU
+# /bin/false Society) offers an annual award for the script with the higest
+# documentation-to-code ratio.
+#
+# At this writing, the documentation for this script is over 1k long.
+# The code is under 512 bytes, without any real effort at terseness.
+#
+# SNUG/b/fS members, we offer this script for your consideration.
+
+use warnings;
+use strict;
+
+my $reponame;
+my @branches;
+local *F;
+
+if ($#ARGV >= 0) {
+   $reponame = $ARGV[0];
+   open(F, "git branch -r |");
+   @branches =  map { chomp; s/^\s*\*?\s*//; $_ } grep { /\s${reponame}\// } <F>;
+   close F;
+} else {
+   open(F, "git branch|");
+   @branches = map { chomp; s/^\s*\*?\s*//; $_ } <F>;
+   close F;
+}
+
+for my $br (@branches) {
+    open(F, "git rev-list master..$br |");
+    my @revisions = <F>;
+    close F;
+    my $n = $#revisions+1;
+    print "$br $n\n";
+}
+
