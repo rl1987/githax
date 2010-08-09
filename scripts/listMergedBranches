@@ -1,4 +1,4 @@
-#!/bin/perl
+#!/usr/bin/perl
 #
 # This is a handy tool I use to see which of my local (and public) branches
 # I have already merged into master.
