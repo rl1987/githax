@@ -11,10 +11,16 @@ use strict;
 #    --stat
 #    one of: -c, -m, --cc
 #    --reverse
+#
+# Note that if you're using this with remove_empty_merges.pl, you need
+# to put it in the pipeline _AFTER_ remove_empty_merges, since
+# remove_empty_merges consumes and produces git log output, whereas
+# this script consumes logs and produces emails.
 
 # Suggested use in a commit script:
 my $suggested_use = q[
     git log --reverse -p --stat --cc "$oldrev..$newrev" |
+     remove_empty_merges.pl |
      log_to_emails.pl "$projectname/${refname#refs/heads/}" |
        formail -I "To: $recipients" \
                -I "From: $GL_USER@torproject.org" \
@@ -22,7 +28,6 @@ my $suggested_use = q[
 ] ;
 
 # Deficiencies:
-#   Doesn't omit conflict-free merges
 #   Doesn't do 003/231 counting in the subject line like format-patch does
 
 my $waiting_for_commit = 1;
