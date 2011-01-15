@@ -19,7 +19,7 @@ use strict;
 
 # Suggested use in a commit script:
 my $suggested_use = q[
-    TOTAL_N_COMMITS=`git log --pretty=format:oneline "$oldrev..$newrev"`
+    TOTAL_N_COMMITS=`git log --pretty=format:oneline "$oldrev..$newrev" | wc -l`
     export TOTAL_N_COMMITS
 
     git log --reverse -p --stat --cc "$oldrev..$newrev" |
