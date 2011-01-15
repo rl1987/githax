@@ -21,7 +21,7 @@ use strict;
 my $suggested_use = q[
     git log --reverse -p --stat --cc "$oldrev..$newrev" |
      remove_empty_merges.pl |
-     log_to_emails.pl "$projectname/${refname#refs/heads/}" |
+     logs_to_emails.pl "$projectname/${refname#refs/heads/}" |
        formail -I "To: $recipients" \
                -I "From: $GL_USER@torproject.org" \
                -s /usr/bin/sendmail -t
