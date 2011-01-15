@@ -66,7 +66,7 @@ while (<>) {
     my $subject = $_;
     $subject =~ s/^\s+//;     $subject =~ s/\s+$//;
 
-    print "From $commitnum Mon Sep 17 00:00:00 2001\n";
+    print "\n\nFrom $commitnum Mon Sep 17 00:00:00 2001\n";
     print "Patch-Author: $headervals{Author}\n";
     print "Subject: $prefix$subject\n\n";
 
