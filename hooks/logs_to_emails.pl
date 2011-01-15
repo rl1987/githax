@@ -40,6 +40,7 @@ if ($prefix) {
 my @headerlines;
 my $commitnum;
 my %headervals;
+my $firsttime = 1;
 
 while (<>) {
     if ($waiting_for_commit) {
@@ -66,7 +67,9 @@ while (<>) {
     my $subject = $_;
     $subject =~ s/^\s+//;     $subject =~ s/\s+$//;
 
-    print "\n\nFrom $commitnum Mon Sep 17 00:00:00 2001\n";
+    print "\n\n" unless ($firsttime);
+    $firsttime = 0;
+    print "From $commitnum Mon Sep 17 00:00:00 2001\n";
     print "Patch-Author: $headervals{Author}\n";
     print "Subject: $prefix$subject\n\n";
 
