@@ -70,6 +70,7 @@ while (<>) {
     print "\n\n" unless ($firsttime);
     $firsttime = 0;
     print "From $commitnum Mon Sep 17 00:00:00 2001\n";
+    print "From: $headervals{Author}\n";
     print "Patch-Author: $headervals{Author}\n";
     print "Subject: $prefix$subject\n\n";
 
