@@ -19,6 +19,9 @@ use strict;
 
 # Suggested use in a commit script:
 my $suggested_use = q[
+    TOTAL_N_COMMITS=`git log --pretty=format:oneline "$oldrev..$newrev"`
+    export TOTAL_N_COMMITS
+
     git log --reverse -p --stat --cc "$oldrev..$newrev" |
      remove_empty_merges.pl |
      logs_to_emails.pl "$projectname/${refname#refs/heads/}" |
@@ -27,20 +30,32 @@ my $suggested_use = q[
                -s /usr/bin/sendmail -t
 ] ;
 
-# Deficiencies:
-#   Doesn't do 003/231 counting in the subject line like format-patch does
+# Set the environment variable TOTAL_N_COMMITS if you want to get a
+# nice 001/123 header in your commits.
+my $NUM_COMMITS = $ENV{TOTAL_N_COMMITS} or "";
 
 my $waiting_for_commit = 1;
 my $prefix = shift @ARGV;
-if ($prefix) {
-    $prefix = "[$prefix] ";
-} else {
-    $prefix = "";
-}
 my @headerlines;
 my $commitnum;
 my %headervals;
 my $firsttime = 1;
+my $commit_idx = 0;
+
+sub getprefix {
+    my $curnum = shift @_;
+    my $extra;
+    if ($NUM_COMMITS eq "") {
+	$extra = "#$curnum";
+    } else {
+	$extra = sprintf("%03d/%03d", $curnum, $NUM_COMMITS);
+    }
+    if ($prefix) {
+	return "[$prefix $extra]";
+    } else {
+	return "[$extra]";
+    }
+}
 
 while (<>) {
     if ($waiting_for_commit) {
@@ -69,10 +84,12 @@ while (<>) {
 
     print "\n\n" unless ($firsttime);
     $firsttime = 0;
+    ++$commit_idx;
     print "From $commitnum Mon Sep 17 00:00:00 2001\n";
     print "From: $headervals{Author}\n";
     print "Patch-Author: $headervals{Author}\n";
-    print "Subject: $prefix$subject\n\n";
+    my $thisprefix = getprefix($commit_idx);
+    print "Subject: $thisprefix $subject\n\n";
 
     print @headerlines;
     $waiting_for_commit = 1;
