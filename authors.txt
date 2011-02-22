@@ -22,6 +22,7 @@ moxie = Moxie Marlinspike <moxie@thoughtcrime.org>
 nickm = Nick Mathewson <nickm@torproject.org>
 pde = Peter Eckersley <pde@eff.org>
 phobos = Andrew Lewman <andrew@torproject.org>
+pootle = translation bot <tor-translation@torproject.org>
 sah = Steven Hazel <sah@freehaven.net>
 sebastian = Sebastian Hahn <sebastian@torproject.org>
 sjm217 = Steven Murdoch <Steven.Murdoch@cl.cam.ac.uk>
@@ -49,7 +50,6 @@ weasel = Peter Palfrader <peter@palfrader.org>
 # kloesing
 # le
 # mfr
-# pootle
 # qbi
 # renner
 # ruben
