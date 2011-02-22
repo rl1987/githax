@@ -24,6 +24,7 @@ pde = Peter Eckersley <pde@eff.org>
 phobos = Andrew Lewman <andrew@torproject.org>
 pootle = translation bot <tor-translation@torproject.org>
 sah = Steven Hazel <sah@freehaven.net>
+runa = Runa A. Sandvik <runa.sandvik@gmail.com>
 sebastian = Sebastian Hahn <sebastian@torproject.org>
 sjm217 = Steven Murdoch <Steven.Murdoch@cl.cam.ac.uk>
 syverson = Paul Syverson <syverson@itd.nrl.navy.mil>
