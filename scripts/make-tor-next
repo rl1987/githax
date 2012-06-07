@@ -1,0 +1,181 @@
+#!/usr/bin/python
+# Copyright 2012, The Tor Project, Inc.  -- License at end of file.
+
+import logging
+import os
+import re
+import subprocess
+import sys
+import time
+
+# Where to build the tor-next tree. this needs to be a clone of the main tor repo
+DIR = os.path.expanduser("~/src/tor-next")
+# What file in that directory do you use for your list of branches to include?
+BRANCHLIST = os.path.join(DIR, "TOR_NEXT_BRANCHES")
+
+# String to add at the front of repository names.  If you don't have
+# git-rw access, you'll want to change this to:
+# REPO_PREFIX = "git://git.torproject.org"
+REPO_PREFIX = "git@git-rw.torproject.org:"
+# List of repositories named in the old fashion (i.e., not with a "user" prefix)
+GRANDFATHERED_REPOS = set("""
+   arma debian erinn hoganrobert ioerror karsten linus mikeperry nickm
+   rpm rransom sebastian sjm
+          """.split())
+# What branch do we base tor-next on?
+BASE_BRANCH = "origin/master"
+# To which repository do we push the pu branch and the tor-next branch?
+TARGET_REPO = "nickm"
+
+logging.basicConfig(level="INFO",
+                    format=">>>> %(levelname)s: %(message)s")
+
+
+# 0. PARSE STUFF.
+
+def read_remotes_and_branches(fname):
+     branches = []
+     with open(fname) as f:
+          for line in f:
+               line = re.sub(r'#.*', '', line)
+               line = line.strip()
+               if not line:
+                    continue
+               if "/" not in line:
+                    logging.warn("Bogus absolute branch %s", line)
+               branches.append(line)
+
+     remotes = set()
+     for b in branches:
+          remotes.add(b.split("/")[0])
+
+     return remotes, branches
+
+remotes, branches = read_remotes_and_branches(BRANCHLIST)
+
+# 1. UPDATE REMOTE STUFF.
+
+def repoName(remote):
+     if remote == "origin":
+          return "%s/tor.git" % REPO_PREFIX
+     elif remote in GRANDFATHERED_REPOS:
+          return "%s/%s/tor.git" % (REPO_PREFIX, remote)
+     else:
+          return "%s/user/%s/tor.git" % (REPO_PREFIX, remote)
+
+def fix_remotes(want_remotes):
+     # what remotes do we have?
+     have_remotes = {}
+     for line in subprocess.check_output(["git", "remote", "-v"]).split("\n"):
+          fields = line.split()
+          if not fields: continue
+          if fields[2] != "(fetch)":
+               continue
+          have_remotes[fields[0]] = fields[1]
+     for rmt in want_remotes:
+          repo = repoName(rmt)
+          if rmt not in have_remotes:
+               logging.info("Adding remote %s", rmt)
+               subprocess.check_call(["git", "remote", "add", rmt, repo])
+          elif have_remotes[rmt] != repo:
+               logging.info("changing URL on remote %s", rmt)
+               subprocess.check_call(["git", "remote", "set-url", rmt, repo])
+          else:
+               logging.info("remote %s looks ok", rmt)
+
+def update_remotes(update_remotes):
+     logging.info("updating origin")
+     subprocess.check_call(["git", "fetch", "origin"])
+     for rmt in update_remotes:
+          logging.info("updating %s", rmt)
+          subprocess.check_call(["git", "fetch", rmt])
+
+os.chdir(DIR)
+fix_remotes(remotes)
+update_remotes(remotes)
+
+# 2. MERGE STUFF INTO A NEW TEMP BRANCH
+
+temp_branch_name = time.strftime("pu-%Y%m%d%H%M%S", time.gmtime())
+subprocess.check_call(["git", "branch", "-f", temp_branch_name, BASE_BRANCH])
+subprocess.check_call(["git", "checkout", temp_branch_name])
+
+def merge_branch(branch):
+     logging.info("Merging %s", branch)
+     try:
+          subprocess.check_call(["git", "merge", "-q", "--no-ff",
+                                 "--no-edit", branch])
+          return True
+     except subprocess.CalledProcessError:
+          logging.warn("Unable to merge %s; rolling back.", branch)
+          subprocess.check_call(["git", "merge", "--abort"])
+          return False
+
+bad_branches = []
+for b in branches:
+     if not merge_branch(b):
+          bad_branches.append(b)
+
+if bad_branches:
+     logging.warn("!!!!!! I couldn't merge %d branches", len(bad_branches))
+     for b in bad_branches:
+          logging.warn("Unable to merge branch: %s", b)
+     sys.exit(1)
+
+# 3. WILL IT STILL BUILD?
+
+logging.info("Looks okay to me.  Will it compile?")
+try:
+     logfile = temp_branch_name+".log"
+     with open(logfile, 'w') as f:
+          logging.info("(logging output to %s", logfile)
+          logging.info("configuring...")
+          subprocess.check_call(["sh", "autogen.sh"], stdout=f,stderr=f)
+          subprocess.check_call(["./configure", "--enable-gcc-warnings"],
+                                stdout=f, stderr=f)
+          logging.info("building...")
+          subprocess.check_call(["make", "clean"], stdout=f, stderr=f)
+          subprocess.check_call(["make", "-j4"], stdout=f, stderr=f)
+except CalledProcessError:
+     logging.warn("Build wasn't clean. Exiting")
+     sys.exit(1)
+
+logging.info("Build seemed to work. Pushing it!")
+
+
+subprocess.check_call(["git", "push", "nickm", temp_branch_name])
+subprocess.check_call(["git", "push", "nickm", "+%s:tor-next"%(temp_branch_name)])
+logging.info("Pushed tor-next. It's a great big beautiful tomorrow.")
+
+
+LICENSE = """
+Copyright 2012, The Tor Project, Inc.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+
+    * Neither the names of the copyright owners nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+"""
