@@ -25,7 +25,7 @@ GRANDFATHERED_REPOS = set("""
 # What branch do we base tor-next on?
 BASE_BRANCH = "origin/master"
 # To which repository do we push the pu branch and the tor-next branch?
-TARGET_REPO = "nickm"
+TARGET_REPO = "tor-next"
 
 logging.basicConfig(level="INFO",
                     format=">>>> %(levelname)s: %(message)s")
@@ -143,8 +143,8 @@ except CalledProcessError:
 logging.info("Build seemed to work. Pushing it!")
 
 
-subprocess.check_call(["git", "push", "nickm", temp_branch_name])
-subprocess.check_call(["git", "push", "nickm", "+%s:tor-next"%(temp_branch_name)])
+subprocess.check_call(["git", "push", TARGET_REPO, temp_branch_name])
+subprocess.check_call(["git", "push", TARGET_REPO, "+%s:tor-next"%(temp_branch_name)])
 logging.info("Pushed tor-next. It's a great big beautiful tomorrow.")
 
 
