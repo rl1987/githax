@@ -122,6 +122,24 @@ if bad_branches:
           logging.warn("Unable to merge branch: %s", b)
      sys.exit(1)
 
+# 2.1. Add a README.tor-next
+
+with open("README.tor-next", 'w') as f:
+     f.write("""\
+# This is tor-next, branch %s.
+#
+# It is made automatically by merging my favorite in-review branches
+# onto Tor master.  USE AT YOUR OWN RISK.
+#
+# Here are the branches I used:
+
+"""% temp_branch_name)
+     f.write( open(BRANCHLIST).read() )
+     f.write("\n")
+
+subprocess.check_call(["git", "add", "README.tor-next"])
+subprocess.check_call(["git", "commit", "-m", "README.tor-next for %s"%temp_branch_name])
+
 # 3. WILL IT STILL BUILD?
 
 logging.info("Looks okay to me.  Will it compile?")
