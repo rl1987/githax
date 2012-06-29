@@ -8,6 +8,10 @@ import subprocess
 import sys
 import time
 
+if len(sys.argv) != 2 or sys.argv[1] not in ["023", "master"]:
+     print >>sys.stderr, "I want an argument: 023 or master."
+     sys.exit(1)
+
 # Where to build the tor-next tree. this needs to be a clone of the main tor repo
 DIR = os.path.expanduser("~/src/tor-next")
 # What file in that directory do you use for your list of branches to include?
@@ -26,28 +30,68 @@ GRANDFATHERED_REPOS = set("""
 BASE_BRANCH = "origin/master"
 # To which repository do we push the pu branch and the tor-next branch?
 TARGET_REPO = "tor-next"
+TARGET_BRANCH = "tor-next"
+
+TMP_BRANCH_PREFIX = "pu-"
 
 logging.basicConfig(level="INFO",
                     format=">>>> %(levelname)s: %(message)s")
 
+if sys.argv[1] == "023":
+     DIR = os.path.expanduser("~/src/tor-next-023")
+     BRANCHLIST = os.path.join(DIR, "TOR_NEXT_BRANCHES")
+     BASE_BRANCH = "origin/release-0.2.3"
+     TARGET_REPO = "tor-next"
+     TARGET_BRANCH = "tor-next-023"
+     TMP_BRANCH_PREFIX = "pu-023-"
 
 # 0. PARSE STUFF.
 
+def parseRemoteConfigLine(line):
+     m = re.match(r'remote\s+(\S+)\s*=\s*(\S+)', line)
+     if not m:
+          return None
+     return m.groups()
+
+branchlist_contents = []
+
 def read_remotes_and_branches(fname):
      branches = []
+     specialRemotes = []
+
      with open(fname) as f:
           for line in f:
+               line_orig = line
                line = re.sub(r'#.*', '', line)
                line = line.strip()
+               if line.startswith("include "):
+                    fname2 = line.split()[1]
+                    branchlist_contents.append("# BEGIN: %s"%line)
+                    r,b = read_remotes_and_branches(os.path.expanduser(fname2))
+                    branchlist_contents.append("# END: %s"%line)
+                    specialRemotes.extend([(k,v) for k,v in r.iteritems()])
+                    branches.extend(b)
+                    continue
+
+               branchlist_contents.append(line_orig)
+
                if not line:
                     continue
+               rmt = parseRemoteConfigLine(line)
+               if rmt != None:
+                    specialRemotes.append(rmt)
+                    continue
+
                if "/" not in line:
                     logging.warn("Bogus absolute branch %s", line)
                branches.append(line)
 
-     remotes = set()
+     remotes = {}
      for b in branches:
-          remotes.add(b.split("/")[0])
+          remotes[b.split("/")[0]] = None
+     for rmt, url in specialRemotes:
+          if rmt in remotes:
+               remotes[rmt] = url
 
      return remotes, branches
 
@@ -72,8 +116,9 @@ def fix_remotes(want_remotes):
           if fields[2] != "(fetch)":
                continue
           have_remotes[fields[0]] = fields[1]
-     for rmt in want_remotes:
-          repo = repoName(rmt)
+     for rmt, repo in want_remotes.iteritems():
+          if repo == None:
+               repo = repoName(rmt)
           if rmt not in have_remotes:
                logging.info("Adding remote %s", rmt)
                subprocess.check_call(["git", "remote", "add", rmt, repo])
@@ -96,7 +141,7 @@ update_remotes(remotes)
 
 # 2. MERGE STUFF INTO A NEW TEMP BRANCH
 
-temp_branch_name = time.strftime("pu-%Y%m%d%H%M%S", time.gmtime())
+temp_branch_name = TMP_BRANCH_PREFIX+time.strftime("%Y%m%d%H%M%S", time.gmtime())
 subprocess.check_call(["git", "branch", "-f", temp_branch_name, BASE_BRANCH])
 subprocess.check_call(["git", "checkout", temp_branch_name])
 
@@ -134,7 +179,7 @@ with open("README.tor-next", 'w') as f:
 # Here are the branches I used:
 
 """% temp_branch_name)
-     f.write( open(BRANCHLIST).read() )
+     f.write( "".join(branchlist_contents) )
      f.write("\n")
 
 subprocess.check_call(["git", "add", "README.tor-next"])
@@ -146,7 +191,7 @@ logging.info("Looks okay to me.  Will it compile?")
 try:
      logfile = temp_branch_name+".log"
      with open(logfile, 'w') as f:
-          logging.info("(logging output to %s", logfile)
+          logging.info("(logging output to %s)", logfile)
           logging.info("configuring...")
           subprocess.check_call(["sh", "autogen.sh"], stdout=f,stderr=f)
           subprocess.check_call(["./configure", "--enable-gcc-warnings"],
@@ -154,16 +199,15 @@ try:
           logging.info("building...")
           subprocess.check_call(["make", "clean"], stdout=f, stderr=f)
           subprocess.check_call(["make", "-j4"], stdout=f, stderr=f)
-except CalledProcessError:
+except subprocess.CalledProcessError:
      logging.warn("Build wasn't clean. Exiting")
      sys.exit(1)
 
 logging.info("Build seemed to work. Pushing it!")
 
-
 subprocess.check_call(["git", "push", TARGET_REPO, temp_branch_name])
-subprocess.check_call(["git", "push", TARGET_REPO, "+%s:tor-next"%(temp_branch_name)])
-logging.info("Pushed tor-next. It's a great big beautiful tomorrow.")
+subprocess.check_call(["git", "push", TARGET_REPO, "+%s:%s"%(temp_branch_name,TARGET_BRANCH)])
+logging.info("Pushed %s. It's a great big beautiful tomorrow.",TARGET_BRANCH)
 
 
 LICENSE = """
