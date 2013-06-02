@@ -32,7 +32,7 @@ my $suggested_use = q[
 
 # Set the environment variable TOTAL_N_COMMITS if you want to get a
 # nice 001/123 header in your commits.
-my $NUM_COMMITS = $ENV{TOTAL_N_COMMITS} or "";
+my $NUM_COMMITS = $ENV{TOTAL_N_COMMITS} || "";
 
 my $waiting_for_commit = 1;
 my $prefix = shift @ARGV;
