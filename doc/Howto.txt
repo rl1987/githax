@@ -80,6 +80,7 @@ like it.
 Let's mess around with the repository a bit.
 
 -----
+% cd PROJECT
 % git status
 # On branch master
 nothing to commit (working directory clean)
