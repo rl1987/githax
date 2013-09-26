@@ -16,7 +16,7 @@ If you know how to use Git
 
 If you know how to use Git, all you need to know is that the official
 PROJECT repository is at
-        git://git.torproject.org/git/PROJECT
+        https://git.torproject.org/git/PROJECT
 and that if you're updating the official repository (we will tell you
 if you're such a person), ssh access is at:
         ssh://git.torproject.org/var/cache/git/PROJECT
@@ -67,7 +67,7 @@ Now we can fetch the repository!  I like to do all my development under
 
 -----
 % cd src
-% git clone git://git.torproject.org/git/PROJECT
+% git clone https://git.torproject.org/git/PROJECT
 -----
 
 There's now a '~/src/PROJECT' directory with the latest version in it.  I
@@ -228,7 +228,7 @@ While you work, there's an upstream repository that's changing too.
 You can update your copy of it with
 
 -----
-% git fetch git://git.torproject.org/git/PROJECT
+% git fetch https://git.torproject.org/git/PROJECT
 -----
 
 That's pretty verbose.  Fortunately, since you started by cloning from
@@ -322,7 +322,7 @@ just do:
 -----
 
 And now you have a new Git repository that other people can fetch from
-git://git.torproject.org/~USERNAME/git/PROJECT
+https://git.torproject.org/~USERNAME/git/PROJECT
 
 For you, that's ssh://git.torproject.org/~USERNAME/git/PROJECT .
 
@@ -381,13 +381,13 @@ repository. Let's say Nick has published his ftp branch, and you want to
 give it a shot. It is not yet ready to be merged to the master branch, so
 you cannot just pull from the master branch. Nick tells you his branch is
 called ftp, and his repository lives at
-git://git.torproject.org/~nickm/git/PROJECT.
+https://git.torproject.org/~nickm/git/PROJECT.
 
 Now it's time for you to add a remote for nicks repository, get his
 published branches, and make a local branch that tracks his ftp branch:
 
 -----
-% git remote add nick git://git.torproject.org/~nickm/git/PROJECT
+% git remote add nick https://git.torproject.org/~nickm/git/PROJECT
 % git fetch nick
 % git branch --track nick_ftp nick/ftp
 % git checkout nick_ftp
