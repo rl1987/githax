@@ -207,9 +207,9 @@ ftp branch:
 0002-second-change.patch
 ...
 
-Mail these files to the project maintainer, maybe with a short idea what
-your bunch of patches is supposed to do, and the maintainer can apply them
-to the official repository.
+Attach these files to a new ticket at https://trac.torproject.org/,
+maybe with a short idea what your bunch of patches is supposed to do,
+and the maintainer can apply them to the official repository.
 
 
 A NOTE ON COMMIT MESSAGES: Many Git tools (like the commit emails, and
