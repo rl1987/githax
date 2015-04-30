@@ -1,0 +1,138 @@
+#!/usr/bin/python
+
+import os
+import sys
+import subprocess
+
+OLD_NAMES_STR = """
+  	arma/bridgedb
+  	arma/tor
+  	arma/tor-ideas
+  	arma/torspec
+  	arma/vidalia
+  	atagar/arm
+  	atagar/pytorctl
+  	atagar/tor-utils
+  	chiiph/vidalia
+  	chrisd/polipo
+  	erinn/build-scripts
+  	erinn/thandy
+  	erinn/tor
+  	erinn/torbrowser
+  	erinn/vidalia
+  	hoganrobert/tor
+  	hoganrobert/torsocks
+  	ioerror/build-scripts
+ 	ioerror/filedump
+  	ioerror/polipo
+  	ioerror/tor
+  	ioerror/tor-cloud
+  	ioerror/tor-extra
+  	ioerror/torsocks
+  	ioerror/torwall
+  	ioerror/ttdnsd
+  	kaner/bridgedb
+  	kaner/gettor
+  	kaner/weather
+  	karsten/bridgedb
+  	karsten/metrics-db
+  	karsten/metrics-tasks
+  	karsten/metrics-utils
+  	karsten/metrics-web
+  	karsten/tor
+  	karsten/tor-utils
+  	karsten/torflow
+  	karsten/torperf
+  	linus/tor
+  	linus/tor-extra
+  	mikeperry/https-everywhere
+  	mikeperry/pytorctl
+  	mikeperry/tor
+  	mikeperry/torbrowser
+  	mikeperry/torbutton
+  	mikeperry/torflow
+  	mikeperry/torperf
+  	mikeperry/weather
+  	n8fr8/orbot
+   	nickm/bridgedb
+   	nickm/chutney
+   	nickm/githax
+   	nickm/obfsproxy
+   	nickm/thandy
+   	nickm/tor
+   	nickm/tor-ideas
+  	pde/https-everywhere
+  	rransom/libeventbook
+  	rransom/metrics-tasks
+  	rransom/tor
+  	rransom/tor-utils
+  	rransom/torspec
+  	runa/tor-cloud
+  	runa/vidalia
+  	schoen/https-everywhere
+  	sebastian/arm
+  	sebastian/bridgedb
+  	sebastian/gettor
+  	sebastian/githax
+  	sebastian/jtorctl
+  	sebastian/libevent
+  	sebastian/libeventbook
+  	sebastian/orbot
+  	sebastian/puppetor
+  	sebastian/thandy
+  	sebastian/tor
+  	sebastian/tor-utils
+  	sebastian/torbel
+  	sebastian/torbrowser
+  	sebastian/torbutton
+  	sebastian/torperf
+  	sebastian/torspec
+  	sebastian/vidalia
+  	sjm217/build-scripts
+  	sjm217/metrics
+  	sjm217/pluggable-transport
+  	sjm217/tor
+  	sjm217/torbrowser
+  	sjm217/torspec
+  	tomb/torperf
+"""
+
+OLD_NAMES = set(OLD_NAMES_STR.split())
+
+def run():
+    if len(sys.argv) != 3:
+        print "SYNTAX: git-add-tor-remote username repo"
+        sys.exit(1)
+
+    _,cmd = os.path.split(sys.argv[0])
+    if cmd == 'git-seturl-tor-remote':
+        gitcmd = "set-url"
+    else:
+        gitcmd = "add"
+
+    username, repo = sys.argv[1:]
+    if not os.path.isdir(".git"):
+        print "Hey, I'm not in a git repo!"
+        sys.exit(1)
+
+    _, mydir = os.path.split(os.getcwd())
+    if mydir != repo and not mydir.startswith(repo):
+        print "{0} doesn't look like a {1} repository".format(mydir,repo)
+        sys.exit(1)
+
+    reponame = "{username}/{repo}".format(**locals())
+    if reponame in OLD_NAMES:
+        #print "Old name exists for this repository"
+        pass
+    else:
+        #print "No old name for this repository"
+        reponame = "user/{username}/{repo}".format(**locals())
+
+    fullname = "git@git-rw.torproject.org:/{reponame}".format(**locals())
+
+    cmdline = ["git", "remote", gitcmd, username, fullname]
+    print " ".join(cmdline)
+    subprocess.check_call(cmdline)
+
+if __name__ == '__main__':
+    run()
