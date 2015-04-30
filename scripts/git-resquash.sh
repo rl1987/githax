@@ -1,4 +1,7 @@
 #!/bin/sh
+# Absolutely anybody receiving a copy of this script may do anything
+# with it that copyright law would otherwise restrict. There is no
+# warranty. -- Nick Mathewson, 2015.
 
 PARENT="$1"
 
